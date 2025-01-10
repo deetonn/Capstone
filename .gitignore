@@ -1,0 +1,21 @@
+# Byte-compiled / cached files
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+env/
+
+# Database
+*.sqlite3
+
+# Django secret key
+.env
+
+# Static and media files
+staticfiles/
+media/
+
+# VSCode settings
+.vscode/
