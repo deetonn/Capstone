@@ -4,10 +4,21 @@ from django.contrib.auth.models import User
 from .models import Post, Category, Comment
 from django.core.exceptions import ValidationError
 
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name', 'description']
+
 class PostForm(forms.ModelForm):
+    new_category = forms.CharField(
+        max_length=100, 
+        required=False,
+        help_text='Create a new category if not found in the list above'
+    )
+
     class Meta:
         model = Post
-        fields = ['title', 'content', 'featured_image', 'category', 'status']
+        fields = ['title', 'content', 'category', 'status']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 10}),
             'status': forms.Select(choices=[
@@ -15,6 +26,21 @@ class PostForm(forms.ModelForm):
                 ('published', 'Published')
             ])
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make category field optional
+        self.fields['category'].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        category = cleaned_data.get('category')
+        new_category = cleaned_data.get('new_category')
+
+        if not category and not new_category:
+            raise forms.ValidationError('Please either select a category or create a new one.')
+        
+        return cleaned_data
 
 class CommentForm(forms.ModelForm):
     class Meta:

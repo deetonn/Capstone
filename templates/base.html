@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Blog</title>
+    <title>Community Blog</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #2d3436;
-            --secondary-color: #0984e3;
-            --background-color: #f5f6fa;
-            --text-color: #2d3436;
-            --container-width: 800px;
+            --primary-color: #1e293b;
+            --secondary-color: #0ea5e9;
+            --background-color: #f8fafc;
+            --text-color: #334155;
+            --container-width: 1200px;
         }
 
         * {
@@ -21,7 +21,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             line-height: 1.6;
             color: var(--text-color);
             background-color: var(--background-color);
@@ -29,7 +29,7 @@
 
         header {
             background-color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             position: fixed;
             width: 100%;
             top: 0;
@@ -39,7 +39,7 @@
         .header-content {
             max-width: var(--container-width);
             margin: 0 auto;
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -50,77 +50,164 @@
             font-weight: 700;
             color: var(--primary-color);
             text-decoration: none;
-            transition: color 0.3s ease;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .logo a:hover {
+        .logo i {
             color: var(--secondary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
         }
 
         nav ul {
             list-style: none;
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
         }
 
         nav a {
             color: var(--text-color);
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s ease;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         nav a:hover {
             color: var(--secondary-color);
         }
 
+        .create-post-btn {
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .create-post-btn:hover {
+            background: #0284c7;
+            transform: translateY(-1px);
+        }
+
         main {
             max-width: var(--container-width);
-            margin: 6rem auto 2rem;
-            padding: 0 1rem;
-            min-height: calc(100vh - 12rem);
+            margin: 4.5rem auto 2rem;
+            min-height: calc(100vh - 8rem);
         }
 
-        article {
+        .user-menu {
+            position: relative;
+        }
+
+        .user-menu-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .user-menu-button:hover {
+            background: var(--background-color);
+        }
+
+        .user-menu-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 120%;
             background: white;
+            min-width: 200px;
             border-radius: 8px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
-        article:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        article h2 {
-            margin-bottom: 1rem;
-        }
-
-        article h2 a {
-            color: var(--primary-color);
+        .user-menu-content a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
             text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        article h2 a:hover {
-            color: var(--secondary-color);
-        }
-
-        .meta {
+            color: var(--text-color);
+            transition: background 0.2s ease;
             font-size: 0.9rem;
-            color: #636e72;
-            margin-bottom: 1rem;
+        }
+
+        .user-menu-content a:hover {
+            background: var(--background-color);
+        }
+
+        .user-menu.active .user-menu-content {
+            display: block;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .auth-buttons a {
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-login {
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-register {
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-register:hover {
+            background: #0284c7;
+            transform: translateY(-1px);
         }
 
         footer {
             background-color: white;
             padding: 2rem 1rem;
             text-align: center;
-            color: #636e72;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            color: #64748b;
+            font-size: 0.9rem;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-content {
+            max-width: var(--container-width);
+            margin: 0 auto;
         }
 
         .social-links {
@@ -131,121 +218,50 @@
             color: var(--primary-color);
             margin: 0 0.5rem;
             font-size: 1.2rem;
-            transition: color 0.3s ease;
+            transition: color 0.2s ease;
         }
 
         .social-links a:hover {
             color: var(--secondary-color);
         }
 
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .auth-buttons {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .btn {
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: var(--secondary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #0773c5;
-        }
-
-        .btn-outline {
-            border: 1px solid var(--secondary-color);
-            color: var(--secondary-color);
-        }
-
-        .btn-outline:hover {
-            background: var(--secondary-color);
-            color: white;
-        }
-
-        .user-menu {
-            position: relative;
-            display: inline-block;
-        }
-
-        .user-menu-button {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 4px;
-            transition: background 0.3s ease;
-        }
-
-        .user-menu-button:hover {
-            background: #f5f6fa;
-        }
-
-        .user-menu-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background: white;
-            min-width: 160px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
-            z-index: 1000;
-        }
-
-        .user-menu-content a {
-            display: block;
-            padding: 0.75rem 1rem;
-            text-decoration: none;
-            color: var(--text-color);
-            transition: background 0.3s ease;
-        }
-
-        .user-menu-content a:hover {
-            background: #f5f6fa;
-        }
-
-        .user-menu.active .user-menu-content {
-            display: block;
-        }
-
         @media (max-width: 768px) {
-            nav ul {
-                gap: 1rem;
-            }
-            
             .header-content {
                 flex-direction: column;
                 gap: 1rem;
+                padding: 1rem;
             }
 
-            .header-right {
+            .nav-links {
+                flex-direction: column;
+                gap: 1rem;
                 width: 100%;
-                justify-content: center;
-                margin-top: 1rem;
             }
 
-            .auth-buttons {
-                flex-wrap: wrap;
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+            }
+
+            .create-post-btn {
+                width: 100%;
                 justify-content: center;
             }
 
             main {
                 margin-top: 8rem;
+            }
+
+            .auth-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-login, .btn-register {
+                width: 100%;
+                justify-content: center;
+                padding: 0.75rem;
             }
         }
     </style>
@@ -254,20 +270,23 @@
     <header>
         <div class="header-content">
             <div class="logo">
-                <a href="{% url 'blog:post_list' %}">My Blog</a>
+                <a href="{% url 'blog:post_list' %}">
+                    <i class="fas fa-users"></i>
+                    Community Blog
+                </a>
             </div>
-            <nav>
-                <ul>
-                    <li><a href="{% url 'blog:post_list' %}">Home</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Categories</a></li>
-                    {% if user.is_authenticated %}
-                        <li><a href="{% url 'blog:post_create' %}">New Post</a></li>
-                    {% endif %}
-                </ul>
-            </nav>
-            <div class="header-right">
+            <div class="nav-links">
+                <nav>
+                    <ul>
+                        <li><a href="{% url 'blog:post_list' %}"><i class="fas fa-home"></i>Home</a></li>
+                        <li><a href="{% url 'blog:explore' %}"><i class="fas fa-compass"></i>Explore</a></li>
+                        <li><a href="#"><i class="fas fa-tags"></i>Categories</a></li>
+                    </ul>
+                </nav>
                 {% if user.is_authenticated %}
+                    <a href="{% url 'blog:post_create' %}" class="create-post-btn">
+                        <i class="fas fa-pen"></i>Share Your Story
+                    </a>
                     <div class="user-menu" id="userMenu">
                         <div class="user-menu-button" onclick="toggleUserMenu()">
                             <i class="far fa-user"></i>
@@ -275,15 +294,21 @@
                             <i class="fas fa-chevron-down"></i>
                         </div>
                         <div class="user-menu-content">
-                            <a href="#"><i class="fas fa-user-circle"></i> Profile</a>
-                            <a href="#"><i class="fas fa-cog"></i> Settings</a>
-                            <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
+                            <a href="#"><i class="fas fa-user-circle"></i>My Profile</a>
+                            <a href="#"><i class="fas fa-edit"></i>My Posts</a>
+                            <a href="#"><i class="fas fa-bookmark"></i>Saved</a>
+                            <a href="#"><i class="fas fa-cog"></i>Settings</a>
+                            <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i>Sign Out</a>
                         </div>
                     </div>
                 {% else %}
                     <div class="auth-buttons">
-                        <a href="{% url 'login' %}" class="btn btn-outline">Log In</a>
-                        <a href="{% url 'blog:register' %}" class="btn btn-primary">Register</a>
+                        <a href="{% url 'login' %}" class="btn-login">
+                            <i class="fas fa-sign-in-alt"></i>Log In
+                        </a>
+                        <a href="{% url 'blog:register' %}" class="btn-register">
+                            <i class="fas fa-user-plus"></i>Join Community
+                        </a>
                     </div>
                 {% endif %}
             </div>
@@ -296,9 +321,14 @@
     </main>
 
     <footer>
-        <p>&copy; {% now "Y" %} My Blog. All rights reserved.</p>
-        <div class="social-links">
-            <a href="https://github.com/deetonn" target="_blank"><i class="fab fa-github"></i></a>
+        <div class="footer-content">
+            <p>Join our growing community of writers and readers.</p>
+            <div class="social-links">
+                <a href="https://github.com/deetonn" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-discord"></i></a>
+            </div>
+            <p>&copy; {% now "Y" %} Community Blog. All rights reserved.</p>
         </div>
     </footer>
 
@@ -307,7 +337,6 @@
             document.getElementById('userMenu').classList.toggle('active');
         }
 
-        // Close the menu when clicking outside
         document.addEventListener('click', function(event) {
             const userMenu = document.getElementById('userMenu');
             const isClickInside = userMenu.contains(event.target);

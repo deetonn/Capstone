@@ -12,4 +12,5 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('comment/<int:comment_id>/edit/', views.comment_edit, name='comment_edit'),
     path('comment/<int:comment_id>/delete/', views.comment_delete, name='comment_delete'),
+    path('explore/', views.explore, name='explore'),
 ]

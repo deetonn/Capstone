@@ -1,0 +1,452 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="explore-container">
+    <div class="explore-header">
+        <h1>Explore Posts</h1>
+        <p>Discover stories from our community</p>
+    </div>
+
+    <div class="search-section">
+        <form method="get" class="search-form">
+            <div class="search-input">
+                <i class="fas fa-search"></i>
+                <input type="text" name="q" placeholder="Search posts, authors..." value="{{ query }}">
+            </div>
+            
+            <div class="filter-group">
+                <select name="category">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                        <option value="{{ category.slug }}" {% if selected_category == category.slug %}selected{% endif %}>
+                            {{ category.name }} ({{ category.post_count }})
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <select name="sort">
+                    <option value="-published_date" {% if selected_sort == '-published_date' %}selected{% endif %}>Latest</option>
+                    <option value="title" {% if selected_sort == 'title' %}selected{% endif %}>A-Z</option>
+                    <option value="popular" {% if selected_sort == 'popular' %}selected{% endif %}>Most Popular</option>
+                </select>
+
+                <button type="submit" class="filter-button">
+                    <i class="fas fa-filter"></i> Apply Filters
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% if user.is_authenticated and recommended_posts %}
+        <div class="recommended-section">
+            <h2>Recommended for You</h2>
+            <div class="recommended-posts">
+                {% for post in recommended_posts %}
+                    <a href="{% url 'blog:post_detail' slug=post.slug %}" class="recommended-card">
+                        <div class="card-category">
+                            <i class="far fa-folder"></i> {{ post.category.name }}
+                        </div>
+                        <h3>{{ post.title }}</h3>
+                        <div class="card-meta">
+                            <span><i class="far fa-user"></i> {{ post.author.username }}</span>
+                            <span><i class="far fa-clock"></i> {{ post.published_date|date:"M j" }}</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="search-results">
+        {% if query or selected_category %}
+            <div class="results-header">
+                <h2>Search Results</h2>
+                <span>{{ posts.count }} posts found</span>
+            </div>
+        {% endif %}
+
+        {% for post in posts %}
+            <article class="post-card {% if post.match_score >= 75 %}high-match{% elif post.match_score >= 50 %}medium-match{% endif %}">
+                <div class="post-content">
+                    <div class="post-header">
+                        <div class="post-category">
+                            <i class="far fa-folder"></i>
+                            {{ post.category.name }}
+                        </div>
+                        <div class="meta-right">
+                            {% if user.is_authenticated and post.match_score > 0 %}
+                                <span class="match-score {% if post.match_score >= 75 %}high{% elif post.match_score >= 50 %}medium{% else %}low{% endif %}">
+                                    {% if post.match_score >= 75 %}
+                                        <i class="fas fa-star"></i> Perfect Match!
+                                    {% elif post.match_score >= 50 %}
+                                        <i class="fas fa-thumbs-up"></i> Good Match
+                                    {% else %}
+                                        <i class="far fa-star"></i> Similar
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                            <span class="meta-item comments">
+                                <i class="far fa-comments"></i>{{ post.comments.count }}
+                            </span>
+                            <span class="meta-item reading-time">
+                                <i class="far fa-clock"></i>{{ post.content|wordcount|divisibleby:200|add:1 }}m
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <h2>
+                        <a href="{% url 'blog:post_detail' slug=post.slug %}">{{ post.title }}</a>
+                    </h2>
+                    
+                    <div class="post-meta">
+                        <span class="meta-item author">
+                            <i class="far fa-user"></i>{{ post.author.username }}
+                        </span>
+                        <span class="meta-item date">
+                            <i class="far fa-calendar"></i>{{ post.published_date|date:"M j, Y" }}
+                        </span>
+                    </div>
+
+                    <div class="excerpt">
+                        {{ post.content|truncatewords:20 }}
+                        <a href="{% url 'blog:post_detail' slug=post.slug %}" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </article>
+        {% empty %}
+            <div class="no-results">
+                <i class="far fa-sad-tear"></i>
+                <h3>No posts found</h3>
+                <p>Try adjusting your search or filters</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .explore-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .explore-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .explore-header h1 {
+        color: var(--primary-color);
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .explore-header p {
+        color: #64748b;
+    }
+
+    .search-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .search-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .search-input {
+        position: relative;
+    }
+
+    .search-input i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .search-input input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+
+    .filter-group {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .filter-group select {
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        flex: 1;
+    }
+
+    .filter-button {
+        background: var(--secondary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .filter-button:hover {
+        background: #0284c7;
+    }
+
+    .recommended-section {
+        margin-bottom: 2rem;
+    }
+
+    .recommended-section h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+
+    .recommended-posts {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    .recommended-card {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s ease;
+    }
+
+    .recommended-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-category {
+        font-size: 0.8rem;
+        color: var(--secondary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .card-meta {
+        font-size: 0.8rem;
+        color: #64748b;
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: #64748b;
+    }
+
+    .no-results i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .filter-group {
+            flex-direction: column;
+        }
+
+        .recommended-posts {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .match-score {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .match-score.high {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .match-score.medium {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .match-score.low {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .high-match {
+        border: 2px solid #059669;
+        transform: scale(1.02);
+    }
+
+    .medium-match {
+        border: 2px solid #d97706;
+    }
+
+    .post-card.high-match:hover {
+        box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.1), 
+                    0 2px 4px -1px rgba(5, 150, 105, 0.06);
+    }
+
+    .post-card.medium-match:hover {
+        box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.1), 
+                    0 2px 4px -1px rgba(217, 119, 6, 0.06);
+    }
+
+    .post-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.25rem;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .post-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .category-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.75rem;
+        color: var(--text-color);
+        margin-bottom: 0.75rem;
+    }
+
+    .category-badge i {
+        color: var(--secondary-color);
+    }
+
+    .match-badge {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .match-badge.high {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .match-badge.medium {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .match-badge.low {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .post-card h2 {
+        font-size: 1.25rem;
+        line-height: 1.4;
+        margin: 0.5rem 0;
+    }
+
+    .post-card h2 a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .post-card h2 a:hover {
+        color: var(--secondary-color);
+    }
+
+    .post-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        font-size: 0.8rem;
+        color: #64748b;
+    }
+
+    .meta-left, .meta-right {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .meta-item i {
+        color: #94a3b8;
+    }
+
+    .high-match {
+        border-color: #059669;
+    }
+
+    .medium-match {
+        border-color: #d97706;
+    }
+
+    @media (max-width: 640px) {
+        .post-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .meta-right {
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .match-badge {
+            position: static;
+            margin-bottom: 0.75rem;
+        }
+    }
+</style>
+{% endblock %} 
