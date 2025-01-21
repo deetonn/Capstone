@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="delete-confirmation">
+    <i class="fas fa-exclamation-triangle"></i>
+    <h2>Delete Post</h2>
+    <p>Are you sure you want to delete "{{ post.title }}"?</p>
+    <p class="warning">This action cannot be undone.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="button-group">
+            <button type="submit" class="delete-button">
+                <i class="fas fa-trash"></i> Delete Post
+            </button>
+            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="cancel-button">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .delete-confirmation {
+        max-width: 500px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        text-align: center;
+    }
+
+    .delete-confirmation i {
+        font-size: 3rem;
+        color: #dc2626;
+        margin-bottom: 1rem;
+    }
+
+    .delete-confirmation h2 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .warning {
+        color: #dc2626;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .delete-button,
+    .cancel-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .delete-button {
+        background: #dc2626;
+        color: white;
+        border: none;
+    }
+
+    .delete-button:hover {
+        background: #b91c1c;
+    }
+
+    .cancel-button {
+        background: #f1f5f9;
+        color: #64748b;
+        text-decoration: none;
+        border: 1px solid #e2e8f0;
+    }
+
+    .cancel-button:hover {
+        background: #e2e8f0;
+    }
+</style>
+{% endblock %} 
