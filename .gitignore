@@ -6,6 +6,9 @@ __pycache__/
 # Virtual environment
 venv/
 env/
+ENV/
+env.bak/
+venv.bak/
 
 # Database
 *.sqlite3
@@ -19,3 +22,6 @@ media/
 
 # VSCode settings
 .vscode/
+
+# Additional files
+.DS_Store
