@@ -15,34 +15,17 @@ class Category(models.Model):
         return self.name
 
 class Post(models.Model):
-    STATUS_CHOICES = (
-        ('draft', 'Draft'),
-        ('published', 'Published'),
-    )
-    
     title = models.CharField(max_length=200)
-    slug = models.SlugField(
-        unique=True,
-        null=True,
-        blank=True
-    )
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
     content = models.TextField()
-    category = models.ForeignKey(
-        Category, 
-        on_delete=models.PROTECT, 
-        related_name='posts',
-        null=True,
-        blank=True
-    )
-    featured_image = models.ImageField(upload_to='blog/images/', blank=True, null=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
-    created_date = models.DateTimeField(default=timezone.now)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
     published_date = models.DateTimeField(blank=True, null=True)
-    updated_date = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=10, default='draft')
+    slug = models.SlugField(max_length=200, unique=True)
+    category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True)
 
     class Meta:
-        ordering = ['-published_date']
+        ordering = ['-created_date']
 
     def __str__(self):
         return self.title

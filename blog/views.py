@@ -2,10 +2,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
-from .models import Post, Comment
+from .models import Post, Comment, Category
 from .forms import PostForm, CustomUserCreationForm, CommentForm
 from django.contrib.auth import login
 from django.http import JsonResponse, HttpResponseForbidden
+from django.contrib import messages
+from django.db.models import Q, Count
 
 # Create your views here.
 
@@ -42,9 +44,19 @@ def post_detail(request, slug):
 @login_required
 def post_create(request):
     if request.method == "POST":
-        form = PostForm(request.POST, request.FILES)
+        form = PostForm(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
+            
+            # Handle new category creation
+            new_category = form.cleaned_data.get('new_category')
+            if new_category:
+                category, created = Category.objects.get_or_create(
+                    name=new_category,
+                    defaults={'slug': slugify(new_category)}
+                )
+                post.category = category
+            
             post.author = request.user
             post.slug = slugify(post.title)
             
@@ -56,7 +68,12 @@ def post_create(request):
             return redirect('blog:post_detail', slug=post.slug)
     else:
         form = PostForm()
-    return render(request, 'blog/post_form.html', {'form': form, 'action': 'Create'})
+    
+    return render(request, 'blog/post_form.html', {
+        'form': form,
+        'action': 'Create',
+        'categories': Category.objects.all()
+    })
 
 @login_required
 def post_edit(request, slug):
@@ -137,3 +154,78 @@ def comment_delete(request, comment_id):
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return JsonResponse({'success': True})
     return redirect('blog:post_detail', slug=post_slug)
+
+def explore(request):
+    # Get search query
+    query = request.GET.get('q', '')
+    category = request.GET.get('category', '')
+    sort = request.GET.get('sort', '-published_date')
+
+    # Base queryset
+    posts = Post.objects.filter(status='published')
+
+    # Apply search if provided
+    if query:
+        posts = posts.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(author__username__icontains=query)
+        )
+
+    # Apply category filter
+    if category:
+        posts = posts.filter(category__slug=category)
+
+    # Apply sorting
+    valid_sorts = {
+        '-published_date': '-published_date',
+        'title': 'title',
+        'popular': '-comments__count',
+    }
+    posts = posts.annotate(comments_count=Count('comments')).order_by(valid_sorts.get(sort, '-published_date'))
+
+    # Get personalized recommendations if user is logged in
+    recommended_posts = []
+    if request.user.is_authenticated:
+        # Get user's interests based on their posts and interactions
+        user_categories = Post.objects.filter(
+            author=request.user
+        ).values_list('category', flat=True).distinct()
+        
+        # Calculate match score for each post
+        for post in posts:
+            match_score = 0
+            # Same category as user's posts
+            if post.category_id in user_categories:
+                match_score += 50
+            # Same author as posts user has commented on
+            if Comment.objects.filter(
+                author=request.user,
+                post__author=post.author
+            ).exists():
+                match_score += 25
+            # Recent post
+            if post.published_date and (timezone.now() - post.published_date).days < 7:
+                match_score += 25
+            
+            post.match_score = match_score
+
+        recommended_posts = Post.objects.filter(
+            category__in=user_categories
+        ).exclude(
+            author=request.user
+        ).order_by('-published_date')[:5]
+
+    # Get all categories for filter
+    categories = Category.objects.annotate(post_count=Count('post'))
+
+    context = {
+        'posts': posts,
+        'recommended_posts': recommended_posts,
+        'categories': categories,
+        'query': query,
+        'selected_category': category,
+        'selected_sort': sort,
+    }
+    
+    return render(request, 'blog/explore.html', context)

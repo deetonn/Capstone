@@ -2,22 +2,68 @@
 
 {% block content %}
 <div class="post-form-container">
-    <h1>{{ action }} Post</h1>
+    <div class="form-header">
+        <h1>{{ action }} Post</h1>
+        <p class="subtitle">Share your thoughts with the world</p>
+    </div>
     
-    <form method="post" enctype="multipart/form-data" class="post-form">
+    <form method="post" class="post-form">
         {% csrf_token %}
         
         {% for field in form %}
             <div class="form-group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
+                {% if field.name == 'category' %}
+                    <div class="field-header">
+                        <label for="{{ field.id_for_label }}">
+                            <i class="far fa-folder"></i> {{ field.label }}
+                        </label>
+                    </div>
+                    {{ field }}
+                    <div class="help-text">Or create a new category below:</div>
+                {% elif field.name == 'new_category' %}
+                    <div class="field-header">
+                        <label for="{{ field.id_for_label }}">
+                            <i class="fas fa-plus-circle"></i> New Category
+                        </label>
+                    </div>
+                    {{ field }}
+                {% elif field.name == 'title' %}
+                    <div class="field-header">
+                        <label for="{{ field.id_for_label }}">
+                            <i class="fas fa-heading"></i> {{ field.label }}
+                        </label>
+                    </div>
+                    {{ field }}
+                {% elif field.name == 'content' %}
+                    <div class="field-header">
+                        <label for="{{ field.id_for_label }}">
+                            <i class="fas fa-pen"></i> {{ field.label }}
+                        </label>
+                    </div>
+                    {{ field }}
+                {% elif field.name == 'status' %}
+                    <div class="field-header">
+                        <label for="{{ field.id_for_label }}">
+                            <i class="fas fa-globe"></i> {{ field.label }}
+                        </label>
+                    </div>
+                    {{ field }}
+                {% else %}
+                    <div class="field-header">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    </div>
+                    {{ field }}
+                {% endif %}
+                
                 {% if field.errors %}
                     <div class="field-error">
+                        <i class="fas fa-exclamation-circle"></i>
                         {{ field.errors.0 }}
                     </div>
                 {% endif %}
                 {% if field.help_text %}
                     <div class="help-text">
+                        <i class="fas fa-info-circle"></i>
                         {{ field.help_text }}
                     </div>
                 {% endif %}
@@ -43,44 +89,66 @@
     .post-form-container {
         max-width: 800px;
         margin: 2rem auto;
-        padding: 2rem;
+        padding: 3rem;
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                    0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
 
-    .post-form-container h1 {
-        color: var(--primary-color);
-        margin-bottom: 2rem;
+    .form-header {
         text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .form-header h1 {
+        color: var(--primary-color);
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+        color: #64748b;
+        font-size: 1.1rem;
     }
 
     .post-form {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 2rem;
     }
 
     .form-group {
         display: flex;
         flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .field-header {
+        display: flex;
+        align-items: center;
         gap: 0.5rem;
     }
 
-    .form-group label {
+    .field-header label {
         font-weight: 500;
         color: var(--primary-color);
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .form-group input[type="text"],
     .form-group textarea,
     .form-group select {
-        padding: 0.75rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
+        padding: 0.875rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
         font-size: 1rem;
         font-family: inherit;
         transition: all 0.3s ease;
+        background: #f8fafc;
     }
 
     .form-group input[type="text"]:focus,
@@ -88,22 +156,29 @@
     .form-group select:focus {
         outline: none;
         border-color: var(--secondary-color);
-        box-shadow: 0 0 0 3px rgba(7, 115, 197, 0.1);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1);
     }
 
     .form-group textarea {
-        min-height: 200px;
+        min-height: 300px;
         resize: vertical;
     }
 
     .field-error {
         color: #dc2626;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .help-text {
-        font-size: 0.85rem;
-        color: #666;
+        font-size: 0.9rem;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .form-actions {
@@ -117,9 +192,10 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.75rem 1.5rem;
-        border-radius: 6px;
+        padding: 0.875rem 1.75rem;
+        border-radius: 8px;
         font-size: 1rem;
+        font-weight: 500;
         cursor: pointer;
         transition: all 0.3s ease;
     }
@@ -128,22 +204,46 @@
         background: var(--secondary-color);
         color: white;
         border: none;
+        flex: 1;
     }
 
     .submit-button:hover {
-        background: #0773c5;
-        transform: translateY(-1px);
+        background: #0284c7;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.2);
     }
 
     .cancel-button {
         background: #f1f5f9;
         color: #64748b;
         text-decoration: none;
-        border: 1px solid #e2e8f0;
+        border: 2px solid #e2e8f0;
     }
 
     .cancel-button:hover {
         background: #e2e8f0;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .post-form-container {
+            margin: 1rem;
+            padding: 1.5rem;
+        }
+
+        .form-header h1 {
+            font-size: 2rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .submit-button,
+        .cancel-button {
+            width: 100%;
+            justify-content: center;
+        }
     }
 </style>
 {% endblock %} 
