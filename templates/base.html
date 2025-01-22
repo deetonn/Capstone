@@ -39,10 +39,10 @@
         .header-content {
             max-width: var(--container-width);
             margin: 0 auto;
-            padding: 0.75rem 1rem;
+            padding: 1rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
         }
 
         .logo a {
@@ -63,13 +63,22 @@
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 2rem;
+            gap: 1.5rem;
         }
 
         nav ul {
-            list-style: none;
             display: flex;
+            align-items: center;
             gap: 1.5rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         nav a {
@@ -88,16 +97,15 @@
         }
 
         .create-post-btn {
-            background: var(--secondary-color);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s ease;
         }
 
         .create-post-btn:hover {
@@ -163,8 +171,8 @@
 
         .auth-buttons {
             display: flex;
-            gap: 1rem;
             align-items: center;
+            gap: 1rem;
         }
 
         .auth-buttons a {
@@ -285,112 +293,139 @@
         }
 
         .dropdown-content {
-            display: none;
             position: absolute;
             top: 100%;
             left: 0;
             background: white;
             min-width: 280px;
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            padding: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem;
+            display: none;
             z-index: 1000;
         }
 
         .categories-dropdown:hover .dropdown-content {
             display: block;
-            animation: fadeIn 0.2s ease;
         }
 
         .category-item {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 0.75rem 1rem;
+            align-items: center;
+            padding: 0.75rem;
             border-radius: 8px;
-            color: var(--text-color);
-            text-decoration: none;
             transition: all 0.2s ease;
-        }
-
-        .category-item:hover {
-            background: var(--background-color);
-            transform: translateX(4px);
         }
 
         .category-info {
             display: flex;
             flex-direction: column;
-            gap: 0.2rem;
+            gap: 0.25rem;
         }
 
         .category-name {
+            color: var(--text-color);
             font-weight: 500;
-            color: var(--primary-color);
         }
 
         .post-count {
-            font-size: 0.75rem;
             color: #64748b;
+            font-size: 0.8rem;
         }
 
-        .category-item .fa-chevron-right {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            opacity: 0;
-            transition: all 0.2s ease;
+        .category-item:hover {
+            background: #f0f9ff;
         }
 
         .category-item:hover .fa-chevron-right {
-            opacity: 1;
             transform: translateX(4px);
         }
 
         .dropdown-footer {
-            border-top: 1px solid #e5e7eb;
             margin-top: 0.5rem;
             padding-top: 0.5rem;
+            border-top: 1px solid #e5e7eb;
         }
 
         .view-all {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1rem;
+            justify-content: space-between;
+            padding: 0.75rem;
             color: var(--secondary-color);
-            text-decoration: none;
-            border-radius: 8px;
             font-weight: 500;
+            border-radius: 8px;
             transition: all 0.2s ease;
         }
 
         .view-all:hover {
-            background: var(--background-color);
+            background: #f0f9ff;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .fa-chevron-right {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            transition: transform 0.2s ease;
         }
 
-        @media (max-width: 768px) {
-            .dropdown-content {
-                position: static;
-                box-shadow: none;
-                padding: 0;
-                margin-top: 0.5rem;
-            }
+        .user-dropdown {
+            position: relative;
+        }
 
-            .category-item:hover {
-                transform: none;
-            }
+        .dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-trigger:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            min-width: 200px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem;
+            display: none;
+            z-index: 1000;
+        }
+
+        .user-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: #f0f9ff;
+        }
+
+        .dropdown-item i {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -423,10 +458,12 @@
                                         <i class="fas fa-chevron-right"></i>
                                     </a>
                                 {% endfor %}
+                                
                                 <div class="dropdown-footer">
-                                    <a href="{% url 'blog:explore' %}" class="view-all">
+                                    <a href="{% url 'blog:categories' %}" class="view-all">
                                         <i class="fas fa-th-large"></i>
                                         View All Categories
+                                        <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -437,18 +474,25 @@
                     <a href="{% url 'blog:post_create' %}" class="create-post-btn">
                         <i class="fas fa-pen"></i>Share Your Story
                     </a>
-                    <div class="user-menu" id="userMenu">
-                        <div class="user-menu-button" onclick="toggleUserMenu()">
-                            <i class="far fa-user"></i>
-                            <span>{{ user.username }}</span>
+                    <div class="user-dropdown">
+                        <button class="dropdown-trigger">
+                            <i class="fas fa-user-circle"></i>
+                            {{ user.username }}
                             <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="user-menu-content">
-                            <a href="#"><i class="fas fa-user-circle"></i>My Profile</a>
-                            <a href="#"><i class="fas fa-edit"></i>My Posts</a>
-                            <a href="#"><i class="fas fa-bookmark"></i>Saved</a>
-                            <a href="#"><i class="fas fa-cog"></i>Settings</a>
-                            <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i>Sign Out</a>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="{% url 'blog:profile' %}" class="dropdown-item">
+                                <i class="fas fa-user"></i>
+                                My Profile
+                            </a>
+                            <a href="{% url 'blog:my_drafts' %}" class="dropdown-item">
+                                <i class="fas fa-file-alt"></i>
+                                My Drafts
+                            </a>
+                            <a href="{% url 'logout' %}" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
                         </div>
                     </div>
                 {% else %}

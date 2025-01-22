@@ -8,6 +8,9 @@ from django.contrib.auth import login
 from django.http import JsonResponse, HttpResponseForbidden
 from django.contrib import messages
 from django.db.models import Q, Count
+from django.utils import timezone
+from datetime import timedelta
+from django.contrib.auth.models import User
 
 # Create your views here.
 
@@ -102,13 +105,18 @@ def post_edit(request, slug):
 @login_required
 def post_delete(request, slug):
     post = get_object_or_404(Post, slug=slug)
-    if post.author != request.user:
-        return HttpResponseForbidden("You cannot delete this post")
-        
-    if request.method == "POST":
+    
+    # Check if user is author or admin
+    if request.user != post.author and not request.user.is_staff:
+        messages.error(request, "You don't have permission to delete this post.")
+        return redirect('blog:post_detail', slug=slug)
+    
+    if request.method == 'POST':
         post.delete()
-        return redirect('blog:post_list')
-    return render(request, 'blog/post_confirm_delete.html', {'post': post})
+        messages.success(request, "Post successfully deleted.")
+        return redirect('blog:explore')
+    
+    return render(request, 'blog/post_delete.html', {'post': post})
 
 def register(request):
     if request.method == "POST":
@@ -144,16 +152,18 @@ def comment_edit(request, comment_id):
 def comment_delete(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
     
-    # Check if user owns the comment
-    if comment.author != request.user:
-        return HttpResponseForbidden("You cannot delete this comment")
+    # Check if user is author or admin
+    if request.user != comment.author and not request.user.is_staff:
+        return JsonResponse({
+            'success': False,
+            'error': "You don't have permission to delete this comment."
+        })
     
-    post_slug = comment.post.slug
-    comment.delete()
-    
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    if request.method == 'POST':
+        comment.delete()
         return JsonResponse({'success': True})
-    return redirect('blog:post_detail', slug=post_slug)
+    
+    return JsonResponse({'success': False, 'error': "Invalid request method."})
 
 def explore(request):
     # Get search query
@@ -229,3 +239,79 @@ def explore(request):
     }
     
     return render(request, 'blog/explore.html', context)
+
+def categories_list(request):
+    categories = Category.objects.annotate(
+        post_count=Count('post')
+    ).order_by('-post_count')
+    
+    return render(request, 'blog/categories.html', {
+        'categories': categories
+    })
+
+def profile_view(request, username=None):
+    # If no username specified, show current user's profile
+    if username is None and request.user.is_authenticated:
+        user = request.user
+    else:
+        user = get_object_or_404(User, username=username)
+    
+    # Get user statistics
+    stats = {
+        'total_posts': Post.objects.filter(author=user).count(),
+        'published_posts': Post.objects.filter(author=user, status='published').count(),
+        'total_comments': Comment.objects.filter(author=user).count(),
+        'join_date': user.date_joined,
+    }
+    
+    # Get recent activity (last 30 days)
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+    
+    recent_posts = Post.objects.filter(
+        author=user,
+        created_date__gte=thirty_days_ago
+    ).select_related('category').order_by('-created_date')[:5]
+    
+    recent_comments = Comment.objects.filter(
+        author=user,
+        created_date__gte=thirty_days_ago
+    ).select_related('post').order_by('-created_date')[:5]
+    
+    # Get most active categories with post count
+    active_categories = Category.objects.filter(
+        post__author=user
+    ).annotate(
+        post_count=Count('post')
+    ).order_by('-post_count')[:5]
+    
+    return render(request, 'blog/profile.html', {
+        'profile_user': user,
+        'stats': stats,
+        'recent_posts': recent_posts,
+        'recent_comments': recent_comments,
+        'active_categories': active_categories,
+    })
+
+@login_required
+def my_drafts(request):
+    drafts = Post.objects.filter(
+        author=request.user,
+        status='draft'
+    ).order_by('-created_date')
+    
+    return render(request, 'blog/my_drafts.html', {
+        'drafts': drafts
+    })
+
+@login_required
+def publish_post(request, slug):
+    post = get_object_or_404(Post, slug=slug, author=request.user)
+    
+    if request.method == 'POST':
+        post.status = 'published'
+        post.published_date = timezone.now()
+        post.save()
+        messages.success(request, 'Post published successfully!')
+        return redirect('blog:post_detail', slug=post.slug)
+    
+    return redirect('blog:my_drafts')

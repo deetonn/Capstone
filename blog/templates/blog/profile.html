@@ -1,0 +1,398 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="profile-header">
+        <div class="profile-info">
+            <div class="avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="user-info">
+                <h1>{{ profile_user.username }}</h1>
+                <p class="join-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    Joined {{ stats.join_date|date:"F Y" }}
+                </p>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.published_posts }}</div>
+                <div class="stat-label">Published Posts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_comments }}</div>
+                <div class="stat-label">Comments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ active_categories.count }}</div>
+                <div class="stat-label">Categories</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-content">
+        <div class="activity-section">
+            <h2>Recent Activity</h2>
+            
+            {% if recent_posts %}
+                <div class="activity-group">
+                    <h3><i class="fas fa-pencil-alt"></i> Recent Posts</h3>
+                    <div class="activity-cards">
+                        {% for post in recent_posts %}
+                            <a href="{% url 'blog:post_detail' slug=post.slug %}" class="activity-card">
+                                <div class="activity-header">
+                                    <h4>{{ post.title }}</h4>
+                                    <span class="status-badge {% if post.status == 'published' %}published{% else %}draft{% endif %}">
+                                        {{ post.status }}
+                                    </span>
+                                </div>
+                                <p class="preview-text">{{ post.content|truncatewords:15 }}</p>
+                                <div class="activity-meta">
+                                    <span class="category">
+                                        <i class="fas fa-folder"></i>
+                                        {{ post.category.name|default:"Uncategorized" }}
+                                    </span>
+                                    <span class="date">
+                                        <i class="far fa-calendar-alt"></i>
+                                        {{ post.created_date|date:"M j, Y" }}
+                                    </span>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if recent_comments %}
+                <div class="activity-group">
+                    <h3><i class="fas fa-comments"></i> Recent Comments</h3>
+                    <div class="activity-cards">
+                        {% for comment in recent_comments %}
+                            <div class="activity-card comment-card">
+                                <p class="preview-text">{{ comment.content|truncatewords:20 }}</p>
+                                <div class="comment-context">
+                                    <i class="fas fa-reply"></i>
+                                    on "<a href="{% url 'blog:post_detail' slug=comment.post.slug %}" class="post-link">{{ comment.post.title }}</a>"
+                                </div>
+                                <div class="activity-meta">
+                                    <span class="date">
+                                        <i class="far fa-clock"></i>
+                                        {{ comment.created_date|date:"M j, Y" }}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if not recent_posts and not recent_comments %}
+                <div class="no-activity">
+                    <i class="far fa-calendar-times"></i>
+                    <p>No recent activity</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="categories-section">
+            <h2>Most Active Categories</h2>
+            <div class="categories-grid">
+                {% for category in active_categories %}
+                    <a href="{% url 'blog:explore' %}?category={{ category.slug }}" class="category-card">
+                        <h3>{{ category.name }}</h3>
+                        <span class="post-count">{{ category.post_count }} posts</span>
+                    </a>
+                {% empty %}
+                    <p class="no-categories">No posts in any categories yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-page {
+        max-width: var(--container-width);
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .profile-header {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-info {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .avatar {
+        font-size: 4rem;
+        color: var(--primary-color);
+    }
+
+    .user-info h1 {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .join-date {
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .stat-card {
+        background: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .profile-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+
+    .activity-section h2,
+    .categories-section h2 {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+    }
+
+    .activity-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .activity-section h2 {
+        font-size: 1.75rem;
+        color: var(--primary-color);
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .activity-group {
+        margin-bottom: 2.5rem;
+    }
+
+    .activity-group h3 {
+        font-size: 1.2rem;
+        color: var(--secondary-color);
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .activity-cards {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .activity-card {
+        background: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .activity-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border-color: #cbd5e1;
+    }
+
+    .activity-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .activity-header h4 {
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-weight: 500;
+        text-transform: capitalize;
+    }
+
+    .status-badge.published {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-badge.draft {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .preview-text {
+        color: #475569;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .activity-meta {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .activity-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .comment-card {
+        background: #f8fafc;
+    }
+
+    .comment-context {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .post-link {
+        color: var(--secondary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .post-link:hover {
+        text-decoration: underline;
+    }
+
+    .no-activity {
+        text-align: center;
+        padding: 3rem 0;
+        color: #94a3b8;
+    }
+
+    .no-activity i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .categories-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .categories-section h2 {
+        font-size: 1.75rem;
+        color: var(--primary-color);
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .categories-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .category-card {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.2s ease;
+    }
+
+    .category-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .category-card h3 {
+        color: var(--primary-color);
+        margin-bottom: 0.25rem;
+    }
+
+    .post-count {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .profile-content {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-info {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .activity-section {
+            padding: 1.5rem;
+        }
+
+        .activity-cards {
+            gap: 0.75rem;
+        }
+
+        .activity-card {
+            padding: 1.25rem;
+        }
+    }
+</style>
+{% endblock %} 

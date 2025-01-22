@@ -463,6 +463,10 @@
         margin-bottom: 1rem;
         color: #cbd5e1;
     }
+
+    .comment {
+        transition: opacity 0.3s ease;
+    }
 </style>
 
 <script>
@@ -529,10 +533,21 @@
                 
                 const data = await response.json();
                 if (data.success) {
-                    document.getElementById(`comment-${commentId}`).remove();
+                    const commentElement = document.getElementById(`comment-${commentId}`);
+                    commentElement.style.opacity = '0';
+                    setTimeout(() => {
+                        commentElement.remove();
+                        // Update comment count
+                        const countElement = document.querySelector('h3');
+                        const currentCount = parseInt(countElement.textContent.match(/\d+/)[0]);
+                        countElement.textContent = `Comments (${currentCount - 1})`;
+                    }, 300);
+                } else {
+                    alert(data.error || 'Error deleting comment');
                 }
             } catch (error) {
-                console.error('Error deleting comment:', error);
+                console.error('Error:', error);
+                alert('Error deleting comment');
             }
         }
     }
