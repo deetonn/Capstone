@@ -24,6 +24,6 @@ TEMPLATES = [
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-ALLOWED_HOSTS = ['*.herokuapp.com', 'deeton-6bef4848d387.herokuapp.com']
+ALLOWED_HOSTS = ['deeton-6bef4848d387.herokuapp.com']
 
 django_heroku.settings(locals()) 
