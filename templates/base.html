@@ -264,6 +264,134 @@
                 padding: 0.75rem;
             }
         }
+
+        .categories-dropdown {
+            position: relative;
+        }
+
+        .dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .dropdown-trigger .fa-chevron-down {
+            font-size: 0.8rem;
+            transition: transform 0.2s ease;
+        }
+
+        .categories-dropdown:hover .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 280px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 0.5rem;
+            z-index: 1000;
+        }
+
+        .categories-dropdown:hover .dropdown-content {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .category-item:hover {
+            background: var(--background-color);
+            transform: translateX(4px);
+        }
+
+        .category-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .category-name {
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .post-count {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .category-item .fa-chevron-right {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .category-item:hover .fa-chevron-right {
+            opacity: 1;
+            transform: translateX(4px);
+        }
+
+        .dropdown-footer {
+            border-top: 1px solid #e5e7eb;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+        }
+
+        .view-all {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            color: var(--secondary-color);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .view-all:hover {
+            background: var(--background-color);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dropdown-content {
+                position: static;
+                box-shadow: none;
+                padding: 0;
+                margin-top: 0.5rem;
+            }
+
+            .category-item:hover {
+                transform: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -280,7 +408,29 @@
                     <ul>
                         <li><a href="{% url 'blog:post_list' %}"><i class="fas fa-home"></i>Home</a></li>
                         <li><a href="{% url 'blog:explore' %}"><i class="fas fa-compass"></i>Explore</a></li>
-                        <li><a href="#"><i class="fas fa-tags"></i>Categories</a></li>
+                        <li class="categories-dropdown">
+                            <a href="#" class="dropdown-trigger">
+                                <i class="fas fa-tags"></i>Categories
+                                <i class="fas fa-chevron-down"></i>
+                            </a>
+                            <div class="dropdown-content">
+                                {% for category in header_categories %}
+                                    <a href="{% url 'blog:explore' %}?category={{ category.slug }}" class="category-item">
+                                        <div class="category-info">
+                                            <span class="category-name">{{ category.name }}</span>
+                                            <span class="post-count">{{ category.post_count }} posts</span>
+                                        </div>
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                {% endfor %}
+                                <div class="dropdown-footer">
+                                    <a href="{% url 'blog:explore' %}" class="view-all">
+                                        <i class="fas fa-th-large"></i>
+                                        View All Categories
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
                     </ul>
                 </nav>
                 {% if user.is_authenticated %}
@@ -344,6 +494,15 @@
             if (!isClickInside && userMenu.classList.contains('active')) {
                 userMenu.classList.remove('active');
             }
+        });
+
+        document.addEventListener('click', function(event) {
+            const dropdowns = document.querySelectorAll('.categories-dropdown');
+            dropdowns.forEach(dropdown => {
+                if (!dropdown.contains(event.target)) {
+                    dropdown.querySelector('.dropdown-content').style.display = 'none';
+                }
+            });
         });
     </script>
 </body>
