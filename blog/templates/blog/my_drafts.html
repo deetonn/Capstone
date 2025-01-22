@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="drafts-container">
+    <div class="page-header">
+        <h1>My Drafts</h1>
+        <p>Manage your unpublished posts</p>
+    </div>
+
+    {% if drafts %}
+        <div class="drafts-list">
+            {% for draft in drafts %}
+                <article class="draft-card">
+                    <div class="draft-content">
+                        <div class="draft-header">
+                            <h2>{{ draft.title }}</h2>
+                            <span class="last-modified">
+                                <i class="far fa-clock"></i>
+                                Last modified {{ draft.updated_date|date:"M j, Y" }}
+                            </span>
+                        </div>
+
+                        <div class="draft-preview">
+                            {{ draft.content|truncatewords:30 }}
+                        </div>
+
+                        <div class="draft-category">
+                            <i class="far fa-folder"></i>
+                            {{ draft.category.name|default:"No category" }}
+                        </div>
+
+                        <div class="draft-actions">
+                            <a href="{% url 'blog:post_edit' slug=draft.slug %}" class="action-btn edit-btn">
+                                <i class="fas fa-edit"></i>
+                                Edit Draft
+                            </a>
+                            <button onclick="publishPost('{{ draft.slug }}')" class="action-btn publish-btn">
+                                <i class="fas fa-check"></i>
+                                Publish
+                            </button>
+                            <button onclick="deletePost('{{ draft.slug }}')" class="action-btn delete-btn">
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-drafts">
+            <i class="far fa-file-alt"></i>
+            <h2>No drafts yet</h2>
+            <p>Start writing a new post to see your drafts here.</p>
+            <a href="{% url 'blog:post_create' %}" class="create-post-btn">
+                <i class="fas fa-pen"></i>
+                Create New Post
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .drafts-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        color: var(--primary-color);
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+        color: #64748b;
+    }
+
+    .draft-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+        transition: transform 0.2s ease;
+    }
+
+    .draft-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .draft-content {
+        padding: 1.5rem;
+    }
+
+    .draft-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .draft-header h2 {
+        font-size: 1.25rem;
+        color: var(--primary-color);
+        margin: 0;
+    }
+
+    .last-modified {
+        font-size: 0.85rem;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .draft-preview {
+        color: #4b5563;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    .draft-category {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .draft-actions {
+        display: flex;
+        gap: 0.75rem;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 1rem;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+    }
+
+    .edit-btn {
+        background: #f1f5f9;
+        color: #0284c7;
+    }
+
+    .publish-btn {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .delete-btn {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .action-btn:hover {
+        filter: brightness(0.95);
+    }
+
+    .no-drafts {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .no-drafts i {
+        font-size: 3rem;
+        color: #94a3b8;
+        margin-bottom: 1rem;
+    }
+
+    .no-drafts h2 {
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .no-drafts p {
+        color: #64748b;
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+<script>
+    async function publishPost(slug) {
+        if (confirm('Are you sure you want to publish this post?')) {
+            try {
+                const response = await fetch(`/blog/post/${slug}/publish/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    }
+                });
+                
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error publishing post');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error publishing post');
+            }
+        }
+    }
+
+    async function deletePost(slug) {
+        if (confirm('Are you sure you want to delete this draft? This cannot be undone.')) {
+            try {
+                const response = await fetch(`/blog/post/${slug}/delete/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    }
+                });
+                
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error deleting post');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error deleting post');
+            }
+        }
+    }
+</script>
+{% endblock %} 

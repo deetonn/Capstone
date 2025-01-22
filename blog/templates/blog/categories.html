@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="categories-page">
+    <div class="page-header">
+        <h1>Categories</h1>
+        <p>Explore all topics in our community</p>
+    </div>
+
+    <div class="categories-grid">
+        {% for category in categories %}
+            <a href="{% url 'blog:explore' %}?category={{ category.slug }}" class="category-card">
+                <h3>{{ category.name }}</h3>
+                <p class="post-count">{{ category.post_count }} posts</p>
+                <p class="description">{{ category.description|truncatewords:15 }}</p>
+                <span class="view-posts">View Posts <i class="fas fa-arrow-right"></i></span>
+            </a>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .categories-page {
+        padding: 2rem 1rem;
+        max-width: var(--container-width);
+        margin: 0 auto;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+        color: #64748b;
+    }
+
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .category-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .category-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .category-card h3 {
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .category-card .post-count {
+        color: var(--secondary-color);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .category-card .description {
+        color: #64748b;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .view-posts {
+        color: var(--secondary-color);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .view-posts i {
+        transition: transform 0.2s ease;
+    }
+
+    .category-card:hover .view-posts i {
+        transform: translateX(4px);
+    }
+</style>
+{% endblock %} 
