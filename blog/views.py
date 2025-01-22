@@ -68,6 +68,7 @@ def post_create(request):
                 post.published_date = timezone.now()
             
             post.save()
+            messages.success(request, 'Post created successfully!')
             return redirect('blog:post_detail', slug=post.slug)
     else:
         form = PostForm()
@@ -97,6 +98,7 @@ def post_edit(request, slug):
                 post.published_date = None
                 
             post.save()
+            messages.success(request, 'Post updated successfully!')
             return redirect('blog:post_detail', slug=post.slug)
     else:
         form = PostForm(instance=post)
@@ -113,7 +115,7 @@ def post_delete(request, slug):
     
     if request.method == 'POST':
         post.delete()
-        messages.success(request, "Post successfully deleted.")
+        messages.success(request, 'Post deleted successfully!')
         return redirect('blog:explore')
     
     return render(request, 'blog/post_delete.html', {'post': post})
@@ -124,6 +126,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+            messages.success(request, 'Registration successful! Please log in.')
             return redirect('blog:post_list')
     else:
         form = CustomUserCreationForm()
