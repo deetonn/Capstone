@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="notifications-container">
+    <h1>Notifications</h1>
+    
+    {% if notifications %}
+        <div class="notifications-list">
+            {% for notification in notifications %}
+                <div class="notification-card {% if not notification.read %}unread{% endif %}">
+                    <div class="notification-content">
+                        <i class="fas fa-comment"></i>
+                        <p>
+                            <strong>{{ notification.comment.author.username }}</strong> commented on your post 
+                            "<a href="{% url 'blog:post_detail' slug=notification.post.slug %}#comment-{{ notification.comment.id }}">{{ notification.post.title }}</a>"
+                        </p>
+                    </div>
+                    <span class="notification-date">{{ notification.created_date|timesince }} ago</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-notifications">
+            <i class="far fa-bell-slash"></i>
+            <p>No notifications yet</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block styles %}
+    .notifications-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+
+    .notification-card {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .notification-card.unread {
+        background: #f0f9ff;
+        border-left: 4px solid var(--secondary-color);
+    }
+
+    .notification-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .notification-date {
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .notification-badge {
+        background: var(--error-color);
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+    }
+
+    .no-notifications {
+        text-align: center;
+        padding: 3rem;
+        color: #64748b;
+    }
+
+    .no-notifications i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+{% endblock %}

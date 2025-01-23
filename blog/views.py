@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
-from .models import Post, Comment, Category
+from .models import Post, Comment, Category, Notification
 from .forms import PostForm, CustomUserCreationForm, CommentForm
 from django.contrib.auth import login
 from django.http import JsonResponse, HttpResponseForbidden
@@ -27,20 +27,29 @@ def post_detail(request, slug):
     new_comment = None
 
     if request.method == 'POST':
-        comment_form = CommentForm(data=request.POST)
-        if comment_form.is_valid() and request.user.is_authenticated:
-            new_comment = comment_form.save(commit=False)
-            new_comment.post = post
-            new_comment.author = request.user
-            new_comment.save()
-            return redirect('blog:post_detail', slug=post.slug)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.author = request.user
+            comment.post = post
+            comment.save()
+
+            # Create notification for post author (if it's not their own comment)
+            if post.author != request.user:
+                Notification.objects.create(
+                    recipient=post.author,
+                    post=post,
+                    comment=comment
+                )
+
+            return redirect('blog:post_detail', slug=slug)
     else:
-        comment_form = CommentForm()
+        form = CommentForm()
 
     return render(request, 'blog/post_detail.html', {
         'post': post,
         'comments': comments,
-        'comment_form': comment_form,
+        'comment_form': form,
         'new_comment': new_comment
     })
 
@@ -318,3 +327,13 @@ def publish_post(request, slug):
         return redirect('blog:post_detail', slug=post.slug)
     
     return redirect('blog:my_drafts')
+        
+@login_required
+def notifications(request):
+    print('notifications')
+    notifications = request.user.notifications.all()
+    # Mark all as read when viewed
+    notifications.filter(read=False).update(read=True)
+    return render(request, 'blog/notifications.html', {
+        'notifications': notifications
+    })

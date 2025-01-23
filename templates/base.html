@@ -630,6 +630,17 @@
                                     <i class="fas fa-file-alt"></i>
                                     My Drafts
                                 </a>
+                                <a href="{% url 'blog:notifications' %}" class="dropdown-item">
+                                    <i class="fas fa-bell"></i>
+                                    Notifications
+                                    {% if user.is_authenticated %}
+                                        {% with unread_count=user.notifications.all|length %}
+                                            {% if unread_count > 0 %}
+                                                <span class="notification-badge">{{ unread_count }}</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endif %}
+                                </a>
                                 <a href="{% url 'logout' %}" class="dropdown-item">
                                     <i class="fas fa-sign-out-alt"></i>
                                     Logout
