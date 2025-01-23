@@ -18,4 +18,5 @@ urlpatterns = [
     path('profile/<str:username>/', views.profile_view, name='profile_with_username'),
     path('my-drafts/', views.my_drafts, name='my_drafts'),
     path('post/<slug:slug>/publish/', views.publish_post, name='publish_post'),
+    path('notifications/', views.notifications, name='notifications'),
 ]
