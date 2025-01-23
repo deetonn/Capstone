@@ -99,7 +99,9 @@
         </div>
     </section>
 </article>
+{% endblock %}
 
+{% block styles %}
 <style>
     .post-detail {
         max-width: 800px;
@@ -468,7 +470,9 @@
         transition: opacity 0.3s ease;
     }
 </style>
+{% endblock %}
 
+{% block scripts %}
 <script>
     function editComment(commentId) {
         const commentDiv = document.getElementById(`comment-${commentId}`);

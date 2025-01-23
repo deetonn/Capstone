@@ -7,11 +7,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #1e293b;
-            --secondary-color: #0ea5e9;
+            --primary-color: #1a365d;
+            --secondary-color: #0369a1;
             --background-color: #f8fafc;
-            --text-color: #334155;
+            --text-color: #1a202c;
+            --link-hover: #034c81;
             --container-width: 1200px;
+            --error-color: #dc2626;
+            --success-color: #15803d;
         }
 
         * {
@@ -93,7 +96,7 @@
         }
 
         nav a:hover {
-            color: var(--secondary-color);
+            color: var(--link-hover);
         }
 
         .create-post-btn {
@@ -109,7 +112,7 @@
         }
 
         .create-post-btn:hover {
-            background: #0284c7;
+            background: var(--link-hover);
             transform: translateY(-1px);
         }
 
@@ -183,7 +186,7 @@
         }
 
         .btn-login {
-            color: var(--text-color);
+            color: var(--primary-color);
             display: flex;
             align-items: center;
             gap: 0.4rem;
@@ -200,7 +203,7 @@
         }
 
         .btn-register:hover {
-            background: #0284c7;
+            background: var(--link-hover);
             transform: translateY(-1px);
         }
 
@@ -208,7 +211,7 @@
             background-color: white;
             padding: 2rem 1rem;
             text-align: center;
-            color: #64748b;
+            color: #4a5568;
             font-size: 0.9rem;
             box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
         }
@@ -230,7 +233,7 @@
         }
 
         .social-links a:hover {
-            color: var(--secondary-color);
+            color: var(--link-hover);
         }
 
         @media (max-width: 768px) {
@@ -336,7 +339,7 @@
         }
 
         .post-count {
-            color: #64748b;
+            color: #4a5568;
             font-size: 0.8rem;
         }
 
@@ -446,7 +449,7 @@
         }
 
         .mobile-menu-btn:hover {
-            color: var(--secondary-color);
+            color: var(--link-hover);
         }
 
         @media (max-width: 768px) {
@@ -536,6 +539,22 @@
                 display: none !important;
             }
         }
+
+        .help-text, .meta-text {
+            color: #4a5568;
+        }
+
+        .status-badge.published {
+            background: #dcfce7;
+            color: var(--success-color);
+        }
+
+        .status-badge.draft {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        {% block styles %}{% endblock %}
     </style>
 </head>
 <body>
@@ -698,6 +717,8 @@
                 menuIcon.classList.add('fa-bars');
             }
         });
+
+        {% block scripts %}{% endblock %}
     </script>
 </body>
 </html> 

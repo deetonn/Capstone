@@ -59,7 +59,9 @@
         </div>
     {% endif %}
 </div>
+{% endblock %}
 
+{% block styles %}
 <style>
     .drafts-container {
         max-width: 800px;
@@ -197,7 +199,9 @@
         margin-bottom: 1.5rem;
     }
 </style>
+{% endblock %}
 
+{% block scripts %}
 <script>
     async function publishPost(slug) {
         if (confirm('Are you sure you want to publish this post?')) {
